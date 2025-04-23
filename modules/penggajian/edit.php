@@ -153,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </button>
                             <a href="index.php" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left"></i> Kembali
-                            </a>mbali</a>
+                            </a>
                     </form>
                 </div>
             </div>
