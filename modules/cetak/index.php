@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="col-md-6">
                             <div class="float-end">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="searchInput" placeholder="Cari laporan..." value="<?php echo htmlspecialchars($search); ?>">
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Cari..." value="<?php echo htmlspecialchars($search); ?>">
                                     <button class="btn btn-outline-secondary" type="button" onclick="realTimeSearch()"><i class="bi bi-search"></i></button>
                                     <?php if (!empty($search)): ?>
                                         <a href="?" class="btn btn-outline-danger"><i class="bi bi-x"></i></a>
