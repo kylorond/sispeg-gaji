@@ -258,11 +258,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <td>
                                             <?php 
                                             $status_class = [
-                                                'Lunas' => 'success',
-                                                'Proses' => 'warning',
-                                                'Pending' => 'secondary'
+                                                'Sudah Dibayar' => 'primary',
+                                                'Belum Dibayar' => 'danger'
                                             ];
-                                            $class = $status_class[$row['status']] ?? 'primary';
+                                            $class = $status_class[$row['status']] ?? 'success';
                                             ?>
                                             <span class="badge bg-<?php echo $class; ?>"><?php echo htmlspecialchars($row['status']); ?></span>
                                         </td>
