@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="col-md-6">
                             <div class="float-end">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="searchInput" placeholder="Cari laporan..." value="<?php echo htmlspecialchars($search); ?>">
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Cari..." value="<?php echo htmlspecialchars($search); ?>">
                                     <button class="btn btn-outline-secondary" type="button" onclick="realTimeSearch()"><i class="bi bi-search"></i></button>
                                     <?php if (!empty($search)): ?>
                                         <a href="?" class="btn btn-outline-danger"><i class="bi bi-x"></i></a>
@@ -294,9 +294,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                             <?php 
                                             $status_class = [
                                                 'Sudah Dibayar' => 'primary',
+<<<<<<< HEAD
                                                 'Belum Dibayar' => 'warning',
+=======
+                                                'Belum Dibayar' => 'danger'
+>>>>>>> 61115a8a539878391d3bee564fe51f920711aa00
                                             ];
-                                            $class = $status_class[$row['status']] ?? 'primary';
+                                            $class = $status_class[$row['status']] ?? 'success';
                                             ?>
                                             <span class="badge bg-<?php echo $class; ?>"><?php echo htmlspecialchars($row['status']); ?></span>
                                         </td>

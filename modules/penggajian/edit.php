@@ -162,11 +162,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         
                         <button type="submit" class="btn btn-primary">
+<<<<<<< HEAD
                             <i class="bi bi-save"></i> Simpan Perubahan
                         </button>
                         <a href="index.php" class="btn btn-secondary">
                             <i class="bi bi-arrow-left"></i> Kembali
                         </a>
+=======
+                                <i class="bi bi-save"></i> Simpan Perubahan
+                            </button>
+                            <a href="index.php" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Kembali
+                            </a>
+>>>>>>> 61115a8a539878391d3bee564fe51f920711aa00
                     </form>
                 </div>
             </div>
