@@ -25,9 +25,6 @@ $current_url = $_SERVER['REQUEST_URI'];
         <li class="<?php echo strpos($current_url, '/modules/jabatan/') !== false ? 'active' : ''; ?>">
             <a href="<?php echo $base_url; ?>/modules/jabatan/index.php"><i class="bi bi-award-fill"></i> Data Jabatan</a>
         </li>
-        <li class="<?php echo strpos($current_url, '/modules/mapel/') !== false ? 'active' : ''; ?>">
-            <a href="<?php echo $base_url; ?>/modules/mapel/index.php"><i class="bi bi-book-fill"></i> Data Mapel</a>
-        </li>
         <li class="<?php echo strpos($current_url, '/modules/penggajian/') !== false ? 'active' : ''; ?>">
             <a href="<?php echo $base_url; ?>/modules/penggajian/index.php"><i class="bi bi-cash-stack"></i> Data Penggajian</a>
         </li>

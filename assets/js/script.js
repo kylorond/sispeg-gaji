@@ -1,18 +1,46 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Sidebar toggle functionality
+    // Sidebar elements
     const sidebar = document.querySelector('.sidebar');
     const content = document.getElementById('content');
     const sidebarCollapse = document.getElementById('sidebarCollapse');
     
-    // Toggle sidebar
+    // Function to toggle sidebar
+    function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        content.classList.toggle('active');
+        
+        // Save state in localStorage
+        const isCollapsed = sidebar.classList.contains('active');
+        localStorage.setItem('sidebarCollapsed', isCollapsed);
+    }
+    
+    // Toggle sidebar when button is clicked
     if (sidebarCollapse) {
-        sidebarCollapse.addEventListener('click', function() {
-            sidebar.classList.toggle('active');
-            content.classList.toggle('active');
-            
-            // Save state in localStorage
-            const isCollapsed = sidebar.classList.contains('active');
-            localStorage.setItem('sidebarCollapsed', isCollapsed);
+        sidebarCollapse.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent event from bubbling to document
+            toggleSidebar();
+        });
+    }
+    
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(e) {
+        // Check if sidebar is open and we're on mobile (or screen is small)
+        const isMobile = window.innerWidth <= 768; // Standard mobile breakpoint
+        const isSidebarOpen = sidebar.classList.contains('active');
+        
+        // Check if click is outside the sidebar and not on the toggle button
+        const isClickInsideSidebar = sidebar.contains(e.target);
+        const isClickOnToggleButton = sidebarCollapse && sidebarCollapse.contains(e.target);
+        
+        if (isMobile && isSidebarOpen && !isClickInsideSidebar && !isClickOnToggleButton) {
+            toggleSidebar();
+        }
+    });
+    
+    // Prevent clicks inside sidebar from closing it
+    if (sidebar) {
+        sidebar.addEventListener('click', function(e) {
+            e.stopPropagation();
         });
     }
     
@@ -52,5 +80,12 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             window.print();
         });
+    });
+    
+    // Handle window resize to adjust sidebar behavior
+    window.addEventListener('resize', function() {
+        // Optional: You can add logic here to handle sidebar on resize
+        // For example, automatically close sidebar when switching to mobile
+        // or ensure it's open when switching to desktop
     });
 });

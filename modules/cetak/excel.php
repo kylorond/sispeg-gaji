@@ -7,6 +7,28 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
+// Function to format date in Indonesian format
+function formatIndonesianDate($date) {
+    if (empty($date) || $date == '0000-00-00') return '-';
+    
+    $monthNames = array(
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    );
+    
+    $dateParts = explode('-', $date);
+    if (count($dateParts) !== 3) return $date;
+    
+    $day = $dateParts[2];
+    $month = $dateParts[1];
+    $year = $dateParts[0];
+    
+    // Remove leading zero from day
+    $day = ltrim($day, '0');
+    
+    return $day . ' ' . $monthNames[(int)$month - 1] . ' ' . $year;
+}
+
 // Query with JOIN to tbl_jabatan
 $query = "SELECT p.*, j.jabatan 
           FROM tbl_penggajian p
@@ -50,22 +72,22 @@ header("Expires: 0");
 <body>
     <table width="100%">
         <tr>
-            <td colspan="7" style="text-align: center; font-size: 16pt; font-weight: bold;">LAPORAN DATA PENGAJIAN</td>
+            <td colspan="8" style="text-align: center; font-size: 16pt; font-weight: bold;">LAPORAN DATA PENGAJIAN</td>
         </tr>
         <tr>
-            <td colspan="7" style="text-align: center;">SMP KRISTEN KOTA PALANGKA RAYA</td>
+            <td colspan="8" style="text-align: center;">SMP KRISTEN KOTA PALANGKA RAYA</td>
         </tr>
         <tr>
-            <td colspan="7" style="text-align: center;">Jl. Tambun Bungai No. 15, Langkai Kec. Pahandut,</td>
+            <td colspan="8" style="text-align: center;">Jl. Tambun Bungai No. 15, Langkai Kec. Pahandut,</td>
         </tr>
         <tr>
-            <td colspan="7" style="text-align: center;">Kota Palangka Raya, Kalimantan Tengah 74874</td>
+            <td colspan="8" style="text-align: center;">Kota Palangka Raya, Kalimantan Tengah 74874</td>
         </tr>
         <tr>
-            <td colspan="7" style="text-align: center;">Dicetak pada: <?php echo date('d/m/Y H:i:s'); ?></td>
+            <td colspan="8" style="text-align: center;">Dicetak pada: <?php echo date('d/m/Y H:i:s'); ?></td>
         </tr>
         <tr>
-            <td colspan="7">&nbsp;</td>
+            <td colspan="8">&nbsp;</td>
         </tr>
     </table>
 
@@ -77,6 +99,7 @@ header("Expires: 0");
                 <th>Nama</th>
                 <th>Jabatan</th>
                 <th>Status</th>
+                <th>Tanggal Gajian</th>
                 <th>Total Gaji</th>
             </tr>
         </thead>
@@ -89,6 +112,7 @@ header("Expires: 0");
                 <td><?php echo $row['nama']; ?></td>
                 <td><?php echo $row['jabatan'] ?? '-'; ?></td>
                 <td class="text-center"><?php echo $row['status']; ?></td>
+                <td class="text-center"><?php echo formatIndonesianDate($row['tgl_gajian']); ?></td>
                 <td class="text-right"><?php echo 'Rp ' . number_format($row['total_gaji'], 0, ',', '.'); ?></td>
             </tr>
             <?php endforeach; ?>

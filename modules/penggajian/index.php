@@ -13,7 +13,7 @@ $sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'id';
 $sort_order = isset($_GET['order']) ? $_GET['order'] : 'ASC';
 
 // Validate sort column to prevent SQL injection
-$allowed_columns = ['id', 'kode_penggajian', 'nama', 'status', 'total_gaji'];
+$allowed_columns = ['id', 'kode_penggajian', 'nama', 'status', 'tgl_gajian', 'total_gaji'];
 if (!in_array($sort_column, $allowed_columns)) {
     $sort_column = 'id';
 }
@@ -32,6 +32,28 @@ if (!empty($search)) {
 $query .= " ORDER BY $sort_column $sort_order";
 
 $result = mysqli_query($conn, $query);
+
+// Function to format date in Indonesian format
+function formatIndonesianDate($date) {
+    if (empty($date)) return '-';
+    
+    $monthNames = array(
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    );
+    
+    $dateParts = explode('-', $date);
+    if (count($dateParts) !== 3) return $date;
+    
+    $day = $dateParts[2];
+    $month = $dateParts[1];
+    $year = $dateParts[0];
+    
+    // Remove leading zero from day
+    $day = ltrim($day, '0');
+    
+    return $day . ' ' . $monthNames[(int)$month - 1] . ' ' . $year;
+}
 ?>
 
 <?php include '../../includes/header.php'; ?>
@@ -205,6 +227,19 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </th>
                                     <th>
                                         <div class="d-flex justify-content-between align-items-center">
+                                            <span>Tanggal Gajian</span>
+                                            <div class="btn-group">
+                                                <a href="?sort=tgl_gajian&order=ASC&search=<?php echo urlencode($search); ?>" class="btn btn-sm btn-outline-light <?php echo ($sort_column == 'tgl_gajian' && $sort_order == 'ASC') ? 'active' : ''; ?>">
+                                                    <i class="bi bi-sort-alpha-down"></i>
+                                                </a>
+                                                <a href="?sort=tgl_gajian&order=DESC&search=<?php echo urlencode($search); ?>" class="btn btn-sm btn-outline-light <?php echo ($sort_column == 'tgl_gajian' && $sort_order == 'DESC') ? 'active' : ''; ?>">
+                                                    <i class="bi bi-sort-alpha-up"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="d-flex justify-content-between align-items-center">
                                             <span>Total Gaji</span>
                                             <div class="btn-group">
                                                 <a href="?sort=total_gaji&order=ASC&search=<?php echo urlencode($search); ?>" class="btn btn-sm btn-outline-light <?php echo ($sort_column == 'total_gaji' && $sort_order == 'ASC') ? 'active' : ''; ?>">
@@ -228,6 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <td><?php echo htmlspecialchars($row['kode_penggajian']); ?></td>
                                         <td><?php echo htmlspecialchars($row['nama']); ?></td>
                                         <td><?php echo htmlspecialchars($row['status']); ?></td>
+                                        <td><?php echo formatIndonesianDate($row['tgl_gajian']); ?></td>
                                         <td class="currency"><?php echo $row['total_gaji']; ?></td>
                                         <td>
                                             <a href="edit.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
@@ -237,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="6" class="text-center">Tidak ada data ditemukan</td>
+                                        <td colspan="7" class="text-center">Tidak ada data ditemukan</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>

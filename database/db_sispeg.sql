@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 21, 2025 at 02:51 AM
+-- Generation Time: Jul 03, 2025 at 08:03 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -33,6 +33,13 @@ CREATE TABLE `tbl_jabatan` (
   `jabatan` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tbl_jabatan`
+--
+
+INSERT INTO `tbl_jabatan` (`id`, `nama`, `jabatan`) VALUES
+(4, 'Super Admin', 'Kepala Sekolah');
+
 -- --------------------------------------------------------
 
 --
@@ -55,8 +62,16 @@ CREATE TABLE `tbl_penggajian` (
   `kode_penggajian` varchar(14) NOT NULL,
   `nama` varchar(50) NOT NULL,
   `status` varchar(50) NOT NULL,
+  `tgl_gajian` date NOT NULL,
   `total_gaji` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_penggajian`
+--
+
+INSERT INTO `tbl_penggajian` (`id`, `kode_penggajian`, `nama`, `status`, `tgl_gajian`, `total_gaji`) VALUES
+(26, '1212', 'Super Admin', 'Sudah Dibayar', '2025-06-12', 1200000);
 
 -- --------------------------------------------------------
 
@@ -78,7 +93,7 @@ CREATE TABLE `tbl_user` (
 --
 
 INSERT INTO `tbl_user` (`id`, `nama`, `alamat`, `nohp`, `username`, `password`) VALUES
-(4, 'Super Admin', 'Jl. Dummy Dummy', '08000000000', 'admin', '21232f297a57a5a743894a0e4a801fc3');
+(4, 'Super Admin', 'Jl. Dummy Yummy', '08000000000', 'admin', '21232f297a57a5a743894a0e4a801fc3');
 
 --
 -- Indexes for dumped tables
@@ -122,13 +137,13 @@ ALTER TABLE `tbl_jabatan`
 -- AUTO_INCREMENT for table `tbl_mapel`
 --
 ALTER TABLE `tbl_mapel`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tbl_penggajian`
 --
 ALTER TABLE `tbl_penggajian`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `tbl_user`

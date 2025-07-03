@@ -8,8 +8,9 @@ $base_url = 'http://' . $_SERVER['HTTP_HOST'] . '/sispeg-gaji';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Informasi Penggajian Pegawai & Guru SMP Kristen Palangka Raya</title>
+    <link rel="icon" href="<?php echo $base_url; ?>/assets/img/logo.jpeg">
     <link rel="stylesheet" href="<?php echo $base_url; ?>/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="<?php echo $base_url; ?>/assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo $base_url; ?>/assets/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>

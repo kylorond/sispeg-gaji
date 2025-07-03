@@ -7,13 +7,35 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
+// Function to format date in Indonesian format
+function formatIndonesianDate($date) {
+    if (empty($date) || $date == '0000-00-00') return '-';
+    
+    $monthNames = array(
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    );
+    
+    $dateParts = explode('-', $date);
+    if (count($dateParts) !== 3) return $date;
+    
+    $day = $dateParts[2];
+    $month = $dateParts[1];
+    $year = $dateParts[0];
+    
+    // Remove leading zero from day
+    $day = ltrim($day, '0');
+    
+    return $day . ' ' . $monthNames[(int)$month - 1] . ' ' . $year;
+}
+
 // Initialize variables for search and sort
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 $sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'p.id';
 $sort_order = isset($_GET['order']) ? $_GET['order'] : 'ASC';
 
 // Validate sort column to prevent SQL injection
-$allowed_columns = ['p.id', 'p.kode_penggajian', 'p.nama', 'j.jabatan', 'p.status', 'p.total_gaji'];
+$allowed_columns = ['p.id', 'p.kode_penggajian', 'p.nama', 'j.jabatan', 'p.status', 'p.tgl_gajian', 'p.total_gaji'];
 if (!in_array($sort_column, $allowed_columns)) {
     $sort_column = 'p.id';
 }
@@ -31,6 +53,7 @@ if (!empty($search)) {
                 OR p.nama LIKE '%$search%' 
                 OR j.jabatan LIKE '%$search%'
                 OR p.status LIKE '%$search%'
+                OR p.tgl_gajian LIKE '%$search%'
                 OR p.total_gaji LIKE '%$search%'";
 }
 
@@ -232,6 +255,19 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </th>
                                     <th>
                                         <div class="d-flex justify-content-between align-items-center">
+                                            <span>Tanggal Gajian</span>
+                                            <div class="btn-group">
+                                                <a href="?sort=p.tgl_gajian&order=ASC&search=<?php echo urlencode($search); ?>" class="btn btn-sm btn-outline-light <?php echo ($sort_column == 'p.tgl_gajian' && $sort_order == 'ASC') ? 'active' : ''; ?>">
+                                                    <i class="bi bi-sort-alpha-down"></i>
+                                                </a>
+                                                <a href="?sort=p.tgl_gajian&order=DESC&search=<?php echo urlencode($search); ?>" class="btn btn-sm btn-outline-light <?php echo ($sort_column == 'p.tgl_gajian' && $sort_order == 'DESC') ? 'active' : ''; ?>">
+                                                    <i class="bi bi-sort-alpha-up"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="d-flex justify-content-between align-items-center">
                                             <span>Total Gaji</span>
                                             <div class="btn-group">
                                                 <a href="?sort=p.total_gaji&order=ASC&search=<?php echo urlencode($search); ?>" class="btn btn-sm btn-outline-light <?php echo ($sort_column == 'p.total_gaji' && $sort_order == 'ASC') ? 'active' : ''; ?>">
@@ -243,7 +279,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                             </div>
                                         </div>
                                     </th>
-                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -258,23 +293,20 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <td>
                                             <?php 
                                             $status_class = [
-                                                'Lunas' => 'success',
-                                                'Proses' => 'warning',
-                                                'Pending' => 'secondary'
+                                                'Sudah Dibayar' => 'primary',
+                                                'Belum Dibayar' => 'warning',
                                             ];
                                             $class = $status_class[$row['status']] ?? 'primary';
                                             ?>
                                             <span class="badge bg-<?php echo $class; ?>"><?php echo htmlspecialchars($row['status']); ?></span>
                                         </td>
+                                        <td><?php echo formatIndonesianDate($row['tgl_gajian']); ?></td>
                                         <td class="currency"><?php echo $row['total_gaji']; ?></td>
-                                        <td>
-                                            <a href="#" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
-                                        </td>
                                     </tr>
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="7" class="text-center">Tidak ada data ditemukan</td>
+                                        <td colspan="8" class="text-center">Tidak ada data ditemukan</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>

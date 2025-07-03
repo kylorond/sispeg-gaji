@@ -16,11 +16,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_POST['user_id'];
     $status = $_POST['status'];
     $total_gaji = $_POST['total_gaji'];
+    $tgl_gajian = $_POST['tgl_gajian'];
     
     // Validate inputs
     if (empty($kode_penggajian) || empty($user_id) || empty($status) || empty($total_gaji)) {
-        header("Location: create.php?error=Semua field harus diisi");
+        header("Location: create.php?error=Semua field wajib harus diisi");
         exit();
+    }
+    
+    // Additional validation for date when status is "Sudah Dibayar"
+    if ($status === 'Sudah Dibayar' && empty($tgl_gajian)) {
+        header("Location: create.php?error=Tanggal gajian wajib diisi ketika status Sudah Dibayar");
+        exit();
+    }
+    
+    // Validate date not in the future
+    if (!empty($tgl_gajian)) {
+        $today = date('Y-m-d');
+        if ($tgl_gajian > $today) {
+            header("Location: create.php?error=Tanggal gajian tidak boleh melebihi hari ini");
+            exit();
+        }
     }
     
     // Get user name from tbl_user
@@ -38,12 +54,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // Insert data
-    $query = "INSERT INTO tbl_penggajian (kode_penggajian, nama, status, total_gaji) 
+    // Insert data - include tgl_gajian in the query
+    $query = "INSERT INTO tbl_penggajian (kode_penggajian, nama, status, total_gaji, tgl_gajian) 
               VALUES ('".mysqli_real_escape_string($conn, $kode_penggajian)."', 
                      '".mysqli_real_escape_string($conn, $nama)."', 
                      '".mysqli_real_escape_string($conn, $status)."', 
-                     '".mysqli_real_escape_string($conn, $total_gaji)."')";
+                     '".mysqli_real_escape_string($conn, $total_gaji)."', 
+                     ".($status === 'Sudah Dibayar' ? "'".mysqli_real_escape_string($conn, $tgl_gajian)."'" : "NULL").")";
     
     if (mysqli_query($conn, $query)) {
         header("Location: index.php?success=Data penggajian berhasil ditambahkan");
@@ -67,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-body">
                     <form action="create.php" method="POST" id="penggajianForm">
                         <?php if (isset($_GET['error'])): ?>
-                            <div class="alert alert-danger"><?php echo $_GET['error']; ?></div>
+                            <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['error']); ?></div>
                         <?php endif; ?>
                         
                         <div class="mb-3">
@@ -104,16 +121,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         
                         <div class="mb-3">
+                            <label for="tgl_gajian" class="form-label">Tanggal Gajian</label>
+                            <input type="date" class="form-control" id="tgl_gajian" name="tgl_gajian" max="<?php echo date('Y-m-d'); ?>">
+                            <div id="dateFeedback" class="invalid-feedback">Tanggal gajian wajib diisi ketika status Sudah Dibayar dan tidak boleh melebihi hari ini</div>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="total_gaji" class="form-label">Total Gaji</label>
                             <input type="number" class="form-control" id="total_gaji" name="total_gaji" required>
                         </div>
                         
                         <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save"></i> Simpan
-                            </button>
-                            <a href="index.php" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left"></i> Kembali
-                            </a>
+                            <i class="bi bi-save"></i> Simpan
+                        </button>
+                        <a href="index.php" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Kembali
+                        </a>
                     </form>
                 </div>
             </div>
@@ -140,12 +163,58 @@ document.getElementById('kode_penggajian').addEventListener('blur', function() {
     }
 });
 
-// Form submission validation - only check for duplicate kode
+// Handle date field based on status selection
+const statusSelect = document.getElementById('status');
+const dateInput = document.getElementById('tgl_gajian');
+const today = new Date().toISOString().split('T')[0];
+
+// Set max date to today
+dateInput.max = today;
+
+statusSelect.addEventListener('change', function() {
+    if (this.value === 'Sudah Dibayar') {
+        dateInput.required = true;
+        dateInput.disabled = false;
+    } else {
+        dateInput.required = false;
+        dateInput.disabled = true;
+        dateInput.value = '';
+    }
+});
+
+// Form submission validation
 document.getElementById('penggajianForm').addEventListener('submit', function(e) {
     const invalidKode = document.getElementById('kode_penggajian').classList.contains('is-invalid');
+    const status = document.getElementById('status').value;
+    const dateValue = document.getElementById('tgl_gajian').value;
+    const today = new Date().toISOString().split('T')[0];
+    
+    let isValid = true;
+    
+    // Check for duplicate kode
     if (invalidKode) {
-        e.preventDefault();
+        isValid = false;
         alert('Tidak dapat menyimpan karena Kode Penggajian sudah digunakan');
+    }
+    
+    // Check if date is required and valid
+    if (status === 'Sudah Dibayar') {
+        if (!dateValue) {
+            document.getElementById('tgl_gajian').classList.add('is-invalid');
+            document.getElementById('dateFeedback').style.display = 'block';
+            isValid = false;
+        } else if (dateValue > today) {
+            document.getElementById('tgl_gajian').classList.add('is-invalid');
+            document.getElementById('dateFeedback').style.display = 'block';
+            isValid = false;
+        } else {
+            document.getElementById('tgl_gajian').classList.remove('is-invalid');
+            document.getElementById('dateFeedback').style.display = 'none';
+        }
+    }
+    
+    if (!isValid) {
+        e.preventDefault();
     }
 });
 </script>

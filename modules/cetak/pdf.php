@@ -9,7 +9,29 @@ if (!isset($_SESSION['username'])) {
 
 require('../../assets/fpdf/fpdf.php');
 
-// Query with JOIN to tbl_jabatan (same as in index.php)
+// Function to format date in Indonesian format
+function formatIndonesianDate($date) {
+    if (empty($date) || $date == '0000-00-00') return '-';
+    
+    $monthNames = array(
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    );
+    
+    $dateParts = explode('-', $date);
+    if (count($dateParts) !== 3) return $date;
+    
+    $day = $dateParts[2];
+    $month = $dateParts[1];
+    $year = $dateParts[0];
+    
+    // Remove leading zero from day
+    $day = ltrim($day, '0');
+    
+    return $day . ' ' . $monthNames[(int)$month - 1] . ' ' . $year;
+}
+
+// Query with JOIN to tbl_jabatan
 $query = "SELECT p.*, j.jabatan 
           FROM tbl_penggajian p
           LEFT JOIN tbl_jabatan j ON p.nama = j.nama";
@@ -49,9 +71,9 @@ class PDF extends FPDF {
     }
     
     function ImprovedTable($header, $data) {
-        // Column widths (adjusted to fit within 190mm width, matching the line above)
-        // Left and right margins are 10mm each (total 20mm), so table width = 190mm
-        $w = array(10, 30, 50, 50, 25, 25); // Total width = 190mm
+        // Column widths (adjusted to fit within 190mm width)
+        // Total width = 190mm (A4 width is 210mm, minus 10mm margins each side)
+        $w = array(10, 25, 40, 40, 25, 25, 25); // Adjusted widths to accommodate new column
         
         // Header
         $this->SetFont('Arial', 'B', 10);
@@ -66,13 +88,15 @@ class PDF extends FPDF {
         foreach($data as $row) {
             $gaji = 'Rp ' . number_format($row['total_gaji'], 0, ',', '.');
             $jabatan = $row['jabatan'] ?? '-';
+            $tgl_gajian = formatIndonesianDate($row['tgl_gajian']);
             
             $this->Cell($w[0], 6, $no++, 'LR', 0, 'C');
             $this->Cell($w[1], 6, $row['kode_penggajian'], 'LR', 0, 'L');
             $this->Cell($w[2], 6, $row['nama'], 'LR', 0, 'L');
             $this->Cell($w[3], 6, $jabatan, 'LR', 0, 'L');
             $this->Cell($w[4], 6, $row['status'], 'LR', 0, 'C');
-            $this->Cell($w[5], 6, $gaji, 'LR', 0, 'R');
+            $this->Cell($w[5], 6, $tgl_gajian, 'LR', 0, 'C');
+            $this->Cell($w[6], 6, $gaji, 'LR', 0, 'R');
             $this->Ln();
         }
         
@@ -81,8 +105,8 @@ class PDF extends FPDF {
     }
 }
 
-// Column headings (removed the empty action column)
-$header = array('No', 'Kode Gaji', 'Nama', 'Jabatan', 'Status', 'Total Gaji');
+// Column headings (now includes Tanggal Gajian)
+$header = array('No', 'Kode Gaji', 'Nama', 'Jabatan', 'Status', 'Tgl Gajian', 'Total Gaji');
 
 // Create PDF instance
 $pdf = new PDF('P', 'mm', 'A4');
